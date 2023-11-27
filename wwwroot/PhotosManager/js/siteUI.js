@@ -14,6 +14,24 @@ function showWaitingGif() {
 function eraseContent() {
   $("#content").empty();
 }
+function renderError(message) {
+  eraseContent();
+  $("#content").append(
+    $(`
+          <div class="errorContainer">
+              ${message}
+          </div>
+          <hr>
+          <div class="cancel">
+        <button class="form-control btn-primary" id="loginCmd">Annuler</button>
+        </div>
+
+      `)
+  );
+  $("#loginCmd").on("click", function () {
+    renderLoginForm();
+  });
+}
 function saveContentScrollPosition() {
   contentScrollPosition = $("#content")[0].scrollTop;
 }
@@ -37,7 +55,7 @@ function updateHeader(titre = "") {
     </div>`)
   );
 }
-function renderLoginPage(Email = "", EmailError = "", passwordError = "") {
+function renderLoginForm(Email = "", EmailError = "", passwordError = "") {
   timeout();
   saveContentScrollPosition();
   eraseContent();
@@ -70,15 +88,51 @@ function renderLoginPage(Email = "", EmailError = "", passwordError = "") {
         </div>
     </div>`)
   );
-}
+  initFormValidation();
 
-function renderInscription() {
-  timeout();
-  saveContentScrollPosition();
-  eraseContent();
-  updateHeader("Inscription", "inscription");
+  $("#aboutCmd").on("click", function () {
+    renderAbout();
+  });
+  $("#createProfilCmd").on("click", function () {
+    renderCreateProfil();
+  });
+  $("#loginForm").on("submit", function (event) {
+    let profil = getFormData($("#loginForm"));
+    console.log(profil);
+    renderError("Le serveur ne répond pas");
+    event.preventDefault();
+
+    // showWaitingGif();
+    // createProfil(profil);
+
+    // if (await API.login(profil.Email, profil.Password)){
+
+    //}
+    // Bookmark.Id = parseInt(Bookmark.Id);
+    // showWaitingGif();
+    // let result = await Bookmarks_API.Save(Bookmark, create);
+    // if (result)
+    //     renderBookmarks();
+    // else
+    //     renderError("Une erreur est survenue!");
+  });
+}
+function getFormData($form) {
+  const removeTag = new RegExp("(<[a-zA-Z0-9]+>)|(</[a-zA-Z0-9]+>)", "g");
+  var jsonObject = {};
+  $.each($form.serializeArray(), (index, control) => {
+    jsonObject[control.name] = control.value.replace(removeTag, "");
+  });
+  return jsonObject;
+}
+function renderCreateProfil() {
+  noTimeout(); // ne pas limiter le temps d’inactivité
+  eraseContent(); // effacer le conteneur #content
+  updateHeader("Inscription", "createProfil"); // mettre à jour l’entête et menu
+  $("#newPhotoCmd").hide(); // camouffler l’icone de commande d’ajout de photo
   $("#content").append(
-    $(`<form class="form" id="createProfilForm"'>
+    $("#content").append(
+      `<form class="form" id="createProfilForm"'>
     <fieldset>
     <legend>Adresse ce courriel</legend>
     <input type="email"
@@ -142,8 +196,27 @@ function renderInscription() {
     </form>
     <div class="cancel">
     <button class="form-control btn-secondary" id="abortCmd">Annuler</button>
-    </div>`)
+    </div>`
+    )
   );
+  $("#loginCmd").on("click", function () {
+    renderLoginForm();
+  });
+  initFormValidation();
+  initImageUploaders();
+  $("#abortCmd").on("click", function () {
+    renderLoginForm();
+  }); // ajouter le mécanisme de vérification de doublon de courriel
+  addConflictValidation(API.checkConflictURL(), "Email", "saveUser");
+  // call back la soumission du formulaire
+  $("#createProfilForm").on("submit", function (event) {
+    let profil = getFormData($("#createProfilForm"));
+    delete profil.matchedPassword;
+    delete profil.matchedEmail;
+    event.preventDefault(); // empêcher le fureteur de soumettre une requête de soumission
+    showWaitingGif(); // afficher GIF d’attente
+    createProfil(profil); // commander la création au service API
+  });
 }
 function renderAbout() {
   timeout();
@@ -172,16 +245,8 @@ function renderAbout() {
 }
 
 function Init_UI() {
-  $("#abortCmd").on("click", function () {
-    renderLoginPage();
-  });
   if (API.retrieveLoggedUser() == null) {
-    renderLoginPage();
+    renderLoginForm();
+  } else {
   }
-  $("#aboutCmd").on("click", function () {
-    renderAbout();
-  });
-  $("#createProfilCmd").on("click", function () {
-    renderInscription();
-  });
 }
