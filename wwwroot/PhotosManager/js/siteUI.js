@@ -98,23 +98,20 @@ function renderLoginForm(Email = "", EmailError = "", passwordError = "") {
   });
   $("#loginForm").on("submit", function (event) {
     let profil = getFormData($("#loginForm"));
-    console.log(profil);
-    renderError("Le serveur ne répond pas");
+    console.log(profil.Email);
+    console.log(profil.Password);
+    // renderError("Le serveur ne répond pas");
     event.preventDefault();
 
     // showWaitingGif();
     // createProfil(profil);
+    let result = API.login(profil.Email, profil.Password);
+    if (result){
 
-    // if (await API.login(profil.Email, profil.Password)){
-
-    //}
-    // Bookmark.Id = parseInt(Bookmark.Id);
-    // showWaitingGif();
-    // let result = await Bookmarks_API.Save(Bookmark, create);
-    // if (result)
-    //     renderBookmarks();
-    // else
-    //     renderError("Une erreur est survenue!");
+    }else{
+      // console.log(API.getErrorState());
+    }
+    
   });
 }
 function getFormData($form) {
