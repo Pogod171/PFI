@@ -55,7 +55,7 @@ function updateHeader(titre = "") {
     </div>`)
   );
 }
-function renderLoginForm(Email = "", EmailError = "", passwordError = "") {
+function renderLoginForm(Email = "", EmailError = "", passwordError = "", expiredSessionMessage = "") {
   timeout();
   saveContentScrollPosition();
   eraseContent();
@@ -96,21 +96,21 @@ function renderLoginForm(Email = "", EmailError = "", passwordError = "") {
   $("#createProfilCmd").on("click", function () {
     renderCreateProfil();
   });
-  $("#loginForm").on("submit", function (event) {
+  $("#loginForm").on("submit", async function (event) {
     let profil = getFormData($("#loginForm"));
-    console.log(profil.Email);
-    console.log(profil.Password);
-    
     // renderError("Le serveur ne répond pas");
     event.preventDefault();
 
     // showWaitingGif();
-    // createProfil(profil);
-    let result = API.login(profil.Email, profil.Password);
+    let result = await API.login(profil.Email, profil.Password);
+    let currentStatus = API.currentStatus;
     if (result){
 
-    }else{
-      // console.log(API.getErrorState());
+    }else if (currentStatus == 481) {
+      renderLoginForm(profil.Email, "Courriel introuvable");
+    }
+    else if(currentStatus == 482){
+      renderLoginForm(profil.Email, "", "Mot de passe incorrect");
     }
     
   });
