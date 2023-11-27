@@ -100,12 +100,13 @@ function renderLoginForm(Email = "", EmailError = "", passwordError = "") {
     let profil = getFormData($("#loginForm"));
     console.log(profil.Email);
     console.log(profil.Password);
+    
     // renderError("Le serveur ne répond pas");
     event.preventDefault();
 
     // showWaitingGif();
     // createProfil(profil);
-    let result = API.login(profil.Email, profil.Password);
+    // let result = API.login(profil.Email, profil.Password);
     if (result){
 
     }else{
