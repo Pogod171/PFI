@@ -106,7 +106,7 @@ function renderLoginForm(Email = "", EmailError = "", passwordError = "") {
 
     // showWaitingGif();
     // createProfil(profil);
-    // let result = API.login(profil.Email, profil.Password);
+    let result = API.login(profil.Email, profil.Password);
     if (result){
 
     }else{
