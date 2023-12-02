@@ -38,22 +38,103 @@ function saveContentScrollPosition() {
 function restoreContentScrollPosition() {
   $("#content")[0].scrollTop = contentScrollPosition;
 }
-function updateHeader(titre = "") {
+function updateHeader(titre = "", header = "", loggedUser = null) {
   $("#header").empty();
-  $("#header").append(
-    $(`<img src="favicon.ico" class="appLogo" alt="" title="Gestionnaire de favoris">
-        <h4 id="actionTitle">${titre}</h4>
-        <div class="dropdown ms-auto">
-            <div data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="cmdIcon fa fa-ellipsis-vertical"></i>
-            </div>
-            <div class="dropdown-menu noselect" id="DDMenu">
-            <div class="dropdown-item menuItemLayout" id="aboutCmd">
-                <i class="menuIcon fa fa-info-circle mx-2"></i> À propos...
-            </div>
-        </div>
-    </div>`)
-  );
+  if (loggedUser == null) {
+    $("#header").append(
+      $(`<img src="favicon.ico" class="appLogo" alt="" title="Gestionnaire de favoris">
+              <h4 id="actionTitle">${titre}</h4>
+              <div class="dropdown ms-auto">
+                  <div data-bs-toggle="dropdown" aria-expanded="false">
+                      <i class="cmdIcon fa fa-ellipsis-vertical"></i>
+                  </div>
+                  <div class="dropdown-menu noselect" id="DDMenu">
+                  <div class="dropdown-item menuItemLayout" id="aboutCmd">
+                      <i class="menuIcon fa fa-info-circle mx-2"></i> À propos...
+                  </div>
+              </div>
+          </div>`)
+    );
+  } else {
+    let menuAdmin =
+      loggedUser.Authorizations.readAccess == 2 &&
+      loggedUser.Authorizations.writeAccess == 2
+        ? `<span class="dropdown-item" id="manageUserCm">
+    <i class="menuIcon fas fa-user-cog mx-2"></i>
+    Gestion des usagers
+    </span>
+    <div class="dropdown-divider"></div>`
+        : ``;
+    $("#header").append(
+      $(`<span title="Liste des photos" id="listPhotosCmd">
+          <img src="images/PhotoCloudLogo.png" class="appLogo">
+           </span>
+          <span class="viewTitle">Liste des photos
+          <div class="cmdIcon fa fa-plus" id="newPhotoCmd" title="Ajouter une photo"></div>
+          </span>
+          <div class="headerMenusContainer">
+          <span>&nbsp;</span> <!--filler-->
+          <i title="Modifier votre profil">
+          <div class="UserAvatarSmall" userid="${loggedUser.Id}" id="editProfilCmd"
+          style="background-image:url('${loggedUser.Avatar}')"
+          title="Nicolas Chourot"></div>
+          </i>
+          <div class="dropdown ms-auto dropdownLayout">
+          <!-- Articles de menu -->
+          
+    <div data-bs-toggle="dropdown" aria-expanded="false">
+    <i class="cmdIcon fa fa-ellipsis-vertical"></i>
+    </div>
+    <div class="dropdown-menu noselect">
+    ${menuAdmin}
+    <span class="dropdown-item" id="logoutCmd">
+    <i class="menuIcon fa fa-sign-out mx-2"></i>
+    Déconnexion
+    </span>
+    <span class="dropdown-item" id="editProfilMenuCmd">
+    <i class="menuIcon fa fa-user-edit mx-2"></i>
+    Modifier votre profil
+    </span>
+    <div class="dropdown-divider"></div>
+    <span class="dropdown-item" id="listPhotosMenuCmd">
+    <i class="menuIcon fa fa-image mx-2"></i>
+    Liste des photos
+    </span>
+    <div class="dropdown-divider"></div>
+    <span class="dropdown-item" id="sortByDateCmd">
+    <i class="menuIcon fa fa-check mx-2"></i>
+    <i class="menuIcon fa fa-calendar mx-2"></i>
+    Photos par date de création
+    </span>
+    <span class="dropdown-item" id="sortByOwnersCmd">
+    <i class="menuIcon fa fa-fw mx-2"></i>
+    <i class="menuIcon fa fa-users mx-2"></i>
+    Photos par créateur
+    </span>
+    <span class="dropdown-item" id="sortByLikesCmd">
+    <i class="menuIcon fa fa-fw mx-2"></i>
+    <i class="menuIcon fa fa-user mx-2"></i>
+    Photos les plus aiméés
+    </span>
+    <span class="dropdown-item" id="ownerOnlyCmd">
+    <i class="menuIcon fa fa-fw mx-2"></i>
+    <i class="menuIcon fa fa-user mx-2"></i>
+    Mes photos
+    </span>
+    <div class="dropdown-divider"></div>
+    <span class="dropdown-item" id="aboutCmd">
+    <i class="menuIcon fa fa-info-circle mx-2"></i>
+    À propos...
+    </span>
+    </div>
+          </div>
+          </div>`)
+    );
+    $("#logoutCmd").on("click", function () {
+      API.logout();
+      renderLoginForm();
+    });
+  }
 }
 function renderLoginForm(
   Email = "",
@@ -61,13 +142,13 @@ function renderLoginForm(
   passwordError = "",
   expiredSessionMessage = ""
 ) {
-  timeout();
+  noTimeout();
   saveContentScrollPosition();
   eraseContent();
   updateHeader("Connexion", "login");
   $("#content").append(
     $(`<div class="content" style="text-align:center">
-        <h3></h3>
+        <h3 class="errorContainer">${expiredSessionMessage}</h3>
         <form class="form" id="loginForm">
             <input type='email'
                 name='Email'
@@ -117,7 +198,6 @@ function renderLoginForm(
         default:
           renderError("Le serveur ne répond pas");
       }
-    } else {
     }
   });
 }
@@ -135,8 +215,7 @@ function renderCreateProfil() {
   updateHeader("Inscription", "createProfil"); // mettre à jour l’entête et menu
   $("#newPhotoCmd").hide(); // camouffler l’icone de commande d’ajout de photo
   $("#content").append(
-    $("#content").append(
-      `<form class="form" id="createProfilForm"'>
+    `<form class="form" id="createProfilForm"'>
     <fieldset>
     <legend>Adresse ce courriel</legend>
     <input type="email"
@@ -201,7 +280,6 @@ function renderCreateProfil() {
     <div class="cancel">
     <button class="form-control btn-secondary" id="abortCmd">Annuler</button>
     </div>`
-    )
   );
   $("#loginCmd").on("click", function () {
     renderLoginForm();
@@ -221,6 +299,17 @@ function renderCreateProfil() {
     showWaitingGif(); // afficher GIF d’attente
     createProfil(profil); // commander la création au service API
   });
+}
+
+function renderMainPage(user) {
+  initTimeout(5, function () {
+    API.logout();
+    renderLoginForm("","","","Votre session est expirée. Veuillez vous reconnecter.");
+  });
+
+  timeout();
+  eraseContent();
+  updateHeader("Liste des photos", "mainPage", user); // mettre à jour l’entête et menu
 }
 function renderAbout() {
   timeout();
@@ -249,9 +338,10 @@ function renderAbout() {
 }
 
 function Init_UI() {
-  if (API.retrieveLoggedUser() == null) {
+  let user = API.retrieveLoggedUser();
+  if (user == null) {
     renderLoginForm();
   } else {
-    renderLoginForm();
+    renderMainPage(user);
   }
 }
