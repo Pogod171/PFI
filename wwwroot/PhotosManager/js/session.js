@@ -22,6 +22,7 @@ let maxStallingTime = infinite;
 
 function initTimeout(stallingTime = infinite, callback = timeoutCallBack) {
     maxStallingTime = stallingTime;
+    console.log(maxStallingTime);
     timeoutCallBack = callback;
     createTimeoutPopup();
     initialized = true;
