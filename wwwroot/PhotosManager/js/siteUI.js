@@ -11,6 +11,11 @@ function showWaitingGif() {
     )
   );
 }
+function isAdmin(loggedUser){
+  return loggedUser.Authorizations.readAccess == 2 &&
+  loggedUser.Authorizations.writeAccess == 2;
+}
+
 function eraseContent() {
   $("#content").empty();
 }
@@ -57,9 +62,8 @@ function updateHeader(titre = "", header = "", loggedUser = null) {
     );
   } else {
     let menuAdmin =
-      loggedUser.Authorizations.readAccess == 2 &&
-      loggedUser.Authorizations.writeAccess == 2
-        ? `<span class="dropdown-item" id="manageUserCm">
+      isAdmin(loggedUser)
+        ? `<span class="dropdown-item" id="manageUserCmd">
     <i class="menuIcon fas fa-user-cog mx-2"></i>
     Gestion des usagers
     </span>
@@ -131,6 +135,9 @@ function updateHeader(titre = "", header = "", loggedUser = null) {
           </div>
           </div>`)
     );
+    $("#manageUserCmd").on("click", function () {
+      renderAdminPage(loggedUser);
+    });
     $("#editProfilMenuCmd").on("click", function () {
       renderEditProfil(loggedUser);
     });
@@ -435,6 +442,44 @@ function renderDeleteProfil(user){
     API.logout();
     renderLoginForm();
   });
+}
+
+function renderAdminPage(loggedUser){
+  if(!isAdmin(loggedUser)){
+    renderMainPage(loggedUser);
+  }
+  else{
+    initTimeout(5, function () {
+      API.logout();
+      renderLoginForm("","","","Votre session est expirée. Veuillez vous reconnecter.");
+    });
+    updateHeader("Gestion des usagers", "admin", loggedUser); // mettre à jour l’entête et menu
+    eraseContent();
+    API.GetAccounts().then(result => {
+      console.log("Resolved data:", result.data); // Access the 'data' array
+      console.log("ETag:", result.ETag); // Access the 'ETag' value
+      result.data.forEach(user => {
+        console.log(user);
+        
+      });
+  }).catch(error => {
+      // Handle any errors that might occur during the Promise execution
+      console.error("Error:", error);
+  });
+    $("#content").append(
+      $(`
+            <div class="cancel">
+            <h3>Voulez-vous vraiment effacer votre compte?</h3>
+            </div>
+            <div class="cancel">
+          <button class="form-control btn-primary" id="deleteCmd">Effacer mon compte</button>
+          <br>
+          <button class="form-control btn-secondary" id="abortCmd">Annuler</button>
+          </div>
+        `)
+    );
+  }
+
 }
 
 function renderAbout() {
