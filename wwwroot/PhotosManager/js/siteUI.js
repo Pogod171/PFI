@@ -211,7 +211,7 @@ function renderCreateProfil() {
   $("#abortCmd").on("click", function () {
     renderLoginForm();
   }); // ajouter le mécanisme de vérification de doublon de courriel
-  addConflictValidation(API.checkConflictURL(), "Email", "saveUser");
+  addConflictValidation(API.checkConflictURL(), "Email", "saveUserCmd");
   // call back la soumission du formulaire
   $("#createProfilForm").on("submit", function (event) {
     let profil = getFormData($("#createProfilForm"));
