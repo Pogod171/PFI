@@ -130,8 +130,8 @@ function Conflict() {
 }
 function addConflictValidation(serviceUrl, fieldName, submitBtnId) {
     let fieldControl = $('#' + fieldName);
-    fieldControl.on("keyup", () => { DelayedConflictTestRequest(serviceUrl, fieldName) });
-    fieldControl.on("blur", () => { ConflictTestRequest(serviceUrl, fieldName) });
+    fieldControl.on("keyup", () => { DelayedConflictTestRequest(serviceUrl, fieldName) });//Vérifie pendant qu'on tape
+    fieldControl.on("blur", () => { ConflictTestRequest(serviceUrl, fieldName) });//si plus de focus
     $("#" + submitBtnId).on("click", () => { ConflictTestRequest(serviceUrl, fieldName) });
     $("#" + submitBtnId).parents('form:first').on("submit", function (e) { return !Conflict(); });
 }

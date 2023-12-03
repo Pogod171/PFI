@@ -226,71 +226,75 @@ function renderCreateProfil() {
   eraseContent(); // effacer le conteneur #content
   updateHeader("Inscription", "createProfil"); // mettre à jour l’entête et menu
   $("#newPhotoCmd").hide(); // camouffler l’icone de commande d’ajout de photo
+  //J'ai rajouter un newProfil
+  //let createProfil = NewProfile();
   $("#content").append(
     `<form class="form" id="createProfilForm"'>
-    <fieldset>
-    <legend>Adresse ce courriel</legend>
-    <input type="email"
-    class="form-control Email"
-    name="Email"
-    id="Email"
-    placeholder="Courriel"
-    required
-    RequireMessage = 'Veuillez entrer votre courriel'
-    InvalidMessage = 'Courriel invalide'
-    CustomErrorMessage ="Ce courriel est déjà utilisé"/>
-    <input class="form-control MatchedInput"
-    type="text"
-    matchedInputId="Email"
-    name="matchedEmail"
-    id="matchedEmail"
-    placeholder="Vérification"
-    required
-    RequireMessage = 'Veuillez entrez de nouveau votre courriel'
-    InvalidMessage="Les courriels ne correspondent pas" />
+      <fieldset>
+        <legend>Adresse ce courriel</legend>
+        <input type="email"
+           class="form-control Email"
+           name="Email"
+           id="Email"
+           placeholder="Courriel"
+           required
+           RequireMessage = 'Veuillez entrer votre courriel'
+           InvalidMessage = 'Courriel invalide'
+           CustomErrorMessage ="Ce courriel est déjà utilisé"
+           
+           />
+        <input class="form-control MatchedInput"
+           type="text"
+           matchedInputId="Email"
+           name="matchedEmail"
+           id="matchedEmail"
+           placeholder="Vérification"
+           required
+           RequireMessage = 'Veuillez entrez de nouveau votre courriel'
+           InvalidMessage="Les courriels ne correspondent pas" />
     </fieldset>
     <fieldset>
-    <legend>Mot de passe</legend>
-    <input type="password"
-    class="form-control"
-    name="Password"
-    id="Password"
-    placeholder="Mot de passe"
-    required
-    RequireMessage = 'Veuillez entrer un mot de passe'
-    InvalidMessage = 'Mot de passe trop court'/>
-    <input class="form-control MatchedInput"
-    type="password"
-    matchedInputId="Password"
-    name="matchedPassword"
-    id="matchedPassword"
-    placeholder="Vérification" required
-    InvalidMessage="Ne correspond pas au mot de passe" />
+      <legend>Mot de passe</legend>
+      <input type="password"
+        class="form-control"
+        name="Password"
+        id="Password"
+        placeholder="Mot de passe"
+        required
+        RequireMessage = 'Veuillez entrer un mot de passe'
+        InvalidMessage = 'Mot de passe trop court'/>
+      <input class="form-control MatchedInput"
+        type="password"
+        matchedInputId="Password"
+        name="matchedPassword"
+        id="matchedPassword"
+        placeholder="Vérification" required
+        InvalidMessage="Ne correspond pas au mot de passe" />
     </fieldset>
     <fieldset>
-    <legend>Nom</legend>
-    <input type="text"
-    class="form-control Alpha"
-    name="Name"
-    id="Name"
-    placeholder="Nom"
-    required
-    RequireMessage = 'Veuillez entrer votre nom'
-    InvalidMessage = 'Nom invalide'/>
+      <legend>Nom</legend>
+      <input type="text"
+        class="form-control Alpha"
+        name="Name"
+        id="Name"
+        placeholder="Nom"
+        required
+        RequireMessage = 'Veuillez entrer votre nom'
+        InvalidMessage = 'Nom invalide'/>
     </fieldset>
     <fieldset>
-    <legend>Avatar</legend>
-    <div class='imageUploader'
-    newImage='true'
-    controlId='Avatar'
-    imageSrc='images/no-avatar.png'
-    waitingImage="images/Loading_icon.gif">
-    </div>
+      <legend>Avatar</legend>
+      <div class='imageUploader'
+        newImage='true'
+        controlId='Avatar'
+        imageSrc='images/no-avatar.png'
+        waitingImage="images/Loading_icon.gif">
+      </div>
     </fieldset>
-    <input type='submit' name='submit' id='saveUserCmd' value="Enregistrer" class="form-control btn-primary">
+     <input type='submit' name='submit' id='saveUserCmd' value="Enregistrer" class="form-control btn-primary">
     </form>
     <div class="cancel">
-    <button class="form-control btn-secondary" id="abortCmd">Annuler</button>
+      <button class="form-control btn-secondary" id="abortCmd">Annuler</button>
     </div>`
   );
   $("#loginCmd").on("click", function () {
@@ -301,7 +305,8 @@ function renderCreateProfil() {
   $("#abortCmd").on("click", function () {
     renderLoginForm();
   }); // ajouter le mécanisme de vérification de doublon de courriel
-  addConflictValidation(API.checkConflictURL(), "Email", "saveUserCmd");
+  addConflictValidation(API.checkConflictURL(), "Email", "saveUserCmd");// il vérifie si c'est un type courriel
+  //Vérifie si le courriel existe déjà dans la base de donnée
   // call back la soumission du formulaire
   $("#createProfilForm").on("submit", function (event) {
     let profil = getFormData($("#createProfilForm"));
@@ -311,6 +316,25 @@ function renderCreateProfil() {
     showWaitingGif(); // afficher GIF d’attente
     createProfil(profil); // commander la création au service API
   });
+}
+/*
+function NewProfile(){
+   let profil = {};
+   profil.Id = 0;
+   profil.Courriel = "";
+   profil.Password = "";
+   profil.Nom = "";
+   profil.Avatar = "";
+   return profil;
+}
+*/
+function createProfil(profil){
+ // if(profil){
+    api.register(profil);
+ // }
+ // else{
+   // renderError("Profil pas créer");
+  //}
 }
 
 function renderMainPage(user) {
@@ -330,78 +354,78 @@ function renderEditProfil(loggedUser){
   $("#newPhotoCmd").hide(); // camouffler l’icone de commande d’ajout de photo
   $("#content").append(
     `<form class="form" id="editProfilForm"'>
-    <input type="hidden" name="Id" id="Id" value="${loggedUser.Id}"/>
-    <fieldset>
-    <legend>Adresse ce courriel</legend>
-    <input type="email"
-    class="form-control Email"
-    name="Email"
-    id="Email"
-    placeholder="Courriel"
-    required
-    RequireMessage = 'Veuillez entrer votre courriel'
-    InvalidMessage = 'Courriel invalide'
-    CustomErrorMessage ="Ce courriel est déjà utilisé"
-    value="${loggedUser.Email}" >
-    <input class="form-control MatchedInput"
-    type="text"
-    matchedInputId="Email"
-    name="matchedEmail"
-    id="matchedEmail"
-    placeholder="Vérification"
-    required
-    RequireMessage = 'Veuillez entrez de nouveau votre courriel'
-    InvalidMessage="Les courriels ne correspondent pas"
-    value="${loggedUser.Email}" >
+      <input type="hidden" name="Id" id="Id" value="${loggedUser.Id}"/>
+      <fieldset>
+        <legend>Adresse ce courriel</legend>
+        <input type="email"
+          class="form-control Email"
+          name="Email"
+          id="Email"
+          placeholder="Courriel"
+          required
+          RequireMessage = 'Veuillez entrer votre courriel'
+          InvalidMessage = 'Courriel invalide'
+          CustomErrorMessage ="Ce courriel est déjà utilisé"
+          value="${loggedUser.Email}" >
+        <input class="form-control MatchedInput"
+          type="text"
+          matchedInputId="Email"
+          name="matchedEmail"
+          id="matchedEmail"
+          placeholder="Vérification"
+          required
+          RequireMessage = 'Veuillez entrez de nouveau votre courriel'
+          InvalidMessage="Les courriels ne correspondent pas"
+          value="${loggedUser.Email}" >
+      </fieldset>
+      <fieldset>
+        <legend>Mot de passe</legend>
+        <input type="password"
+          class="form-control"
+          name="Password"
+          id="Password"
+          placeholder="Mot de passe"
+          InvalidMessage = 'Mot de passe trop court' >
+        <input class="form-control MatchedInput"
+          type="password"
+          matchedInputId="Password"
+          name="matchedPassword"
+          id="matchedPassword"
+          placeholder="Vérification"
+          InvalidMessage="Ne correspond pas au mot de passe" >
     </fieldset>
     <fieldset>
-    <legend>Mot de passe</legend>
-    <input type="password"
-    class="form-control"
-    name="Password"
-    id="Password"
-    placeholder="Mot de passe"
-    InvalidMessage = 'Mot de passe trop court' >
-    <input class="form-control MatchedInput"
-    type="password"
-    matchedInputId="Password"
-    name="matchedPassword"
-    id="matchedPassword"
-    placeholder="Vérification"
-    InvalidMessage="Ne correspond pas au mot de passe" >
+      <legend>Nom</legend>
+      <input type="text"
+        class="form-control Alpha"
+        name="Name"
+        id="Name"
+        placeholder="Nom"
+        required
+        RequireMessage = 'Veuillez entrer votre nom'
+        InvalidMessage = 'Nom invalide'
+        value="${loggedUser.Name}" >
     </fieldset>
     <fieldset>
-    <legend>Nom</legend>
-    <input type="text"
-    class="form-control Alpha"
-    name="Name"
-    id="Name"
-    placeholder="Nom"
-    required
-    RequireMessage = 'Veuillez entrer votre nom'
-    InvalidMessage = 'Nom invalide'
-    value="${loggedUser.Name}" >
+      <legend>Avatar</legend>
+      <div class='imageUploader'
+        newImage='false'
+        controlId='Avatar'
+        imageSrc='${loggedUser.Avatar}'
+         waitingImage="images/Loading_icon.gif">
+      </div>
     </fieldset>
-    <fieldset>
-    <legend>Avatar</legend>
-    <div class='imageUploader'
-    newImage='false'
-    controlId='Avatar'
-    imageSrc='${loggedUser.Avatar}'
-    waitingImage="images/Loading_icon.gif">
-    </div>
-    </fieldset>
-    <input type='submit'
-    name='submit'
-    id='saveUserCmd'
-    value="Enregistrer"
-    class="form-control btn-primary">
+       <input type='submit'
+         name='submit'
+         id='saveUserCmd'
+         value="Enregistrer"
+         class="form-control btn-primary">
     </form>
     <div class="cancel">
-    <button class="form-control btn-secondary" id="abortCmd">Annuler</button>
+      <button class="form-control btn-secondary" id="abortCmd">Annuler</button>
     </div>
     <div class="cancel"> <hr>
-    <button class="form-control btn-warning" id="deleteCmd">Effacer le compte</button>
+      <button class="form-control btn-warning" id="deleteCmd">Effacer le compte</button>
     </div>`
   );
   $("#abortCmd").on("click", function () {
