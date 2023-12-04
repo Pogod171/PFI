@@ -149,7 +149,7 @@ function updateHeader(titre = "", header = "", loggedUser = null) {
           </div>`)
     );
     $("#manageUserCmd").on("click", function () {
-      renderAdminPage(loggedUser);
+      renderAdminPage();
     });
     $("#editProfilMenuCmd").on("click", function () {
       renderEditProfil(loggedUser);
@@ -487,7 +487,8 @@ function renderDeleteProfil(user) {
   });
 }
 
-function renderAdminPage(loggedUser) {
+function renderAdminPage() {
+  let loggedUser = API.retrieveLoggedUser();
   if (!isAdmin(loggedUser)) {
     renderMainPage(loggedUser);
   } else {
@@ -564,6 +565,8 @@ function renderAdminPage(loggedUser) {
   
       $('#content').on('click', '.fas.fa-user-slash', function() {
           var userId = $(this).attr('userid'); // Get the userid from the clicked icon
+          let user = getUserById(result.data, userId);
+          renderRemoveUser(user);
       });
       })
       .catch((error) => {
@@ -575,8 +578,9 @@ function renderAdminPage(loggedUser) {
   }
 }
 
-function renderRemoveUser(userToRemove, loggedUser){
-  initTimeout(5, function () {
+function renderRemoveUser(userToRemove){
+  let loggedUser = API.retrieveLoggedUser();
+  initTimeout(300, function () {
     API.logout();
     renderLoginForm(
       "",
@@ -615,7 +619,7 @@ function renderRemoveUser(userToRemove, loggedUser){
       `)
   );
   $("#abortCmd").on("click", function () {
-    renderAdminPage(loggedUser);
+    renderAdminPage();
   });
   $("#deleteUserForm").on("submit", async function (event) {
     event.preventDefault();
