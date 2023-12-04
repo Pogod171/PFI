@@ -11,9 +11,20 @@ function showWaitingGif() {
     )
   );
 }
-function isAdmin(loggedUser){
-  return loggedUser.Authorizations.readAccess == 2 &&
-  loggedUser.Authorizations.writeAccess == 2;
+function isUser(loggedUser) {
+  return (
+    loggedUser.Authorizations.readAccess == 1 &&
+    loggedUser.Authorizations.writeAccess == 1
+  );
+}
+function isAdmin(loggedUser) {
+  return (
+    loggedUser.Authorizations.readAccess == 2 &&
+    loggedUser.Authorizations.writeAccess == 2
+  );
+}
+function getUserById(usersArray, userId) {
+  return usersArray.find(user => user.Id === userId);
 }
 
 function eraseContent() {
@@ -61,15 +72,17 @@ function updateHeader(titre = "", header = "", loggedUser = null) {
           </div>`)
     );
   } else {
-    let menuAdmin =
-      isAdmin(loggedUser)
-        ? `<span class="dropdown-item" id="manageUserCmd">
+    let menuAdmin = isAdmin(loggedUser)
+      ? `<span class="dropdown-item" id="manageUserCmd">
     <i class="menuIcon fas fa-user-cog mx-2"></i>
     Gestion des usagers
     </span>
     <div class="dropdown-divider"></div>`
+      : ``;
+    let newPhotoCmd =
+      header == `mainPage`
+        ? `<div class="cmdIcon fa fa-plus" id="newPhotoCmd" title="Ajouter une photo"></div>`
         : ``;
-    let newPhotoCmd = header == `mainPage` ? `<div class="cmdIcon fa fa-plus" id="newPhotoCmd" title="Ajouter une photo"></div>` : ``;
     $("#header").append(
       $(`<span title="Liste des photos" id="listPhotosCmd">
           <img src="images/PhotoCloudLogo.png" class="appLogo">
@@ -145,7 +158,6 @@ function updateHeader(titre = "", header = "", loggedUser = null) {
       API.logout();
       renderLoginForm();
     });
-
   }
 }
 function renderLoginForm(
@@ -340,7 +352,12 @@ function createProfil(profil){
 function renderMainPage(user) {
   initTimeout(300, function () {
     API.logout();
-    renderLoginForm("","","","Votre session est expirée. Veuillez vous reconnecter.");
+    renderLoginForm(
+      "",
+      "",
+      "",
+      "Votre session est expirée. Veuillez vous reconnecter."
+    );
   });
 
   timeout();
@@ -348,7 +365,7 @@ function renderMainPage(user) {
   updateHeader("Liste des photos", "mainPage", user); // mettre à jour l’entête et menu
 }
 
-function renderEditProfil(loggedUser){
+function renderEditProfil(loggedUser) {
   eraseContent(); // effacer le conteneur #content
   updateHeader("Profil", "editProfil", loggedUser); // mettre à jour l’entête et menu
   $("#newPhotoCmd").hide(); // camouffler l’icone de commande d’ajout de photo
@@ -436,10 +453,15 @@ function renderEditProfil(loggedUser){
   });
 }
 
-function renderDeleteProfil(user){
+function renderDeleteProfil(user) {
   initTimeout(5, function () {
     API.logout();
-    renderLoginForm("","","","Votre session est expirée. Veuillez vous reconnecter.");
+    renderLoginForm(
+      "",
+      "",
+      "",
+      "Votre session est expirée. Veuillez vous reconnecter."
+    );
   });
   updateHeader("Retrait de compte", "deleteProfil", user); // mettre à jour l’entête et menu
   eraseContent();
@@ -468,42 +490,143 @@ function renderDeleteProfil(user){
   });
 }
 
-function renderAdminPage(loggedUser){
-  if(!isAdmin(loggedUser)){
+function renderAdminPage(loggedUser) {
+  if (!isAdmin(loggedUser)) {
     renderMainPage(loggedUser);
-  }
-  else{
+  } else {
     initTimeout(5, function () {
       API.logout();
-      renderLoginForm("","","","Votre session est expirée. Veuillez vous reconnecter.");
+      renderLoginForm(
+        "",
+        "",
+        "",
+        "Votre session est expirée. Veuillez vous reconnecter."
+      );
     });
     updateHeader("Gestion des usagers", "admin", loggedUser); // mettre à jour l’entête et menu
     eraseContent();
-    API.GetAccounts().then(result => {
-      console.log("Resolved data:", result.data); // Access the 'data' array
-      console.log("ETag:", result.ETag); // Access the 'ETag' value
-      result.data.forEach(user => {
-        console.log(user);
-        
+    $("#content").append(`<div class="UserContainer">`);
+    API.GetAccounts()
+      .then((result) => {
+        result.data.forEach((user) => {
+          console.log(user);
+          let promoIcon = ``;
+          let verifiedIcon = ``;
+          if (isAdmin(user)) {
+            promoIcon = `<i class="fas fa-user-cog dodgerblueCmd" userid="${user.Id}"></i>`;
+          } else if (isUser(user)) {
+            promoIcon = `<i class="fas fa-user-alt dodgerblueCmd" userid="${user.Id}"></i>`;
+          }
+          if(user.VerifyCode == "verified"){
+            verifiedIcon = `<i class="fa-regular fa-circle greenCmd" userid="${user.Id}"></i>`;
+          }
+          else if (user.VerifyCode == "blocked"){
+            verifiedIcon = `<i class="fa fa-ban redCmd" userid="${user.Id}"></i>`;
+          }
+          $("#content").append(
+            $(`
+              <div class="UserRow">
+                <div class="UserLayout">
+                <span class="UserInfo">
+                  <i>
+                    <div class="UserAvatar" userid="${user.Id}"
+                    style="background-image:url('${user.Avatar}')"
+                    title="${user.Name}"></div>
+                  </i>
+                  <span class="UserName">${user.Name}</span>
+                  <span class="UserEmail">${user.Email}</span>
+                </span>
+                </div>
+                <span class="UserCommandPanel">
+                  ${promoIcon}
+                  ${verifiedIcon}
+                  <i class="fas fa-user-slash goldenrodCmd" userid="${user.Id}"></i>
+                </span>
+              </div>
+              </div>
+            `)
+          );
+        });
+      $('#content').on('click', '.fas.fa-user-cog', function() {
+          var userId = $(this).attr('userid'); // Get the userid from the clicked icon
       });
-  }).catch(error => {
-      // Handle any errors that might occur during the Promise execution
-      console.error("Error:", error);
-  });
-    $("#content").append(
-      $(`
-            <div class="cancel">
-            <h3>Voulez-vous vraiment effacer votre compte?</h3>
-            </div>
-            <div class="cancel">
-          <button class="form-control btn-primary" id="deleteCmd">Effacer mon compte</button>
-          <br>
-          <button class="form-control btn-secondary" id="abortCmd">Annuler</button>
-          </div>
-        `)
-    );
+  
+      $('#content').on('click', '.fas.fa-user-alt', function() {
+        var userId = $(this).attr('userid'); // Get the userid from the clicked icon
+        API.promoteAccount(userId);
+      });
+  
+      $('#content').on('click', '.fa-regular.fa-circle, .fa.fa-ban', function() {
+          var userId = $(this).attr('userid'); // Get the userid from the clicked icon
+          console.log('Clicked verification status for user ID:', userId);
+          
+          // Perform specific actions for verification status icon click
+      });
+  
+      $('#content').on('click', '.fas.fa-user-slash', function() {
+          var userId = $(this).attr('userid'); // Get the userid from the clicked icon
+          console.log('Clicked user ban icon for user ID:', userId);
+          
+          // Perform specific actions for user ban icon click
+      });
+      })
+      .catch((error) => {
+        // Handle any errors that might occur during the Promise execution
+        console.error("Error:", error);
+      });
+      $("#content").append(`</div>`);
+    
   }
+}
 
+function renderRemoveUser(userToRemove, loggedUser){
+  initTimeout(5, function () {
+    API.logout();
+    renderLoginForm(
+      "",
+      "",
+      "",
+      "Votre session est expirée. Veuillez vous reconnecter."
+    );
+  });
+  updateHeader("Retrait de compte", "deleteProfil", userToRemove); // mettre à jour l’entête et menu
+  eraseContent();
+  $("#content").append(
+    $(`
+        <form class="UserdeleteForm" id="deleteUserForm">
+          <div class="cancel">
+          <h3>Voulez-vous vraiment effacer cet usager et toutes ses photos?</h3>
+          </div>
+          <div class="UserRow">
+                <div class="UserLayout">
+                <span class="UserInfo">
+                  <i title="Modifier votre profil">
+                    <div class="UserAvatar" userid="${userToRemove.Id}" id="editProfilCmd"
+                    style="background-image:url('${userToRemove.Avatar}')"
+                    title="${userToRemove.Name}"></div>
+                  </i>
+                  <span class="UserName">${userToRemove.Name}</span>
+                  <span class="UserEmail">${userToRemove.Email}</span>
+                </span>
+                </div>
+          </div>
+          <div class="cancel">
+        <button class="form-control btn-primary" id="deleteCmd">Effacer mon compte</button>
+        <br>
+        <button class="form-control btn-secondary" id="abortCmd">Annuler</button>
+        </div>
+        </form>
+      `)
+  );
+  $("#abortCmd").on("click", function () {
+    renderAdminPage(loggedUser);
+  });
+  $("#deleteUserForm").on("submit", async function (event) {
+    event.preventDefault();
+    await API.unsubscribeAccount(userToRemove.Id);
+    API.logout();
+    renderLoginForm();
+  });
 }
 
 function renderAbout() {
