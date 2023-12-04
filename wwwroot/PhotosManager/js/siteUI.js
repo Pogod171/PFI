@@ -454,7 +454,7 @@ function renderEditProfil(loggedUser) {
 }
 
 function renderDeleteProfil(user) {
-  initTimeout(5, function () {
+  initTimeout(300, function () {
     API.logout();
     renderLoginForm(
       "",
@@ -494,7 +494,7 @@ function renderAdminPage(loggedUser) {
   if (!isAdmin(loggedUser)) {
     renderMainPage(loggedUser);
   } else {
-    initTimeout(5, function () {
+    initTimeout(300, function () {
       API.logout();
       renderLoginForm(
         "",
@@ -547,27 +547,26 @@ function renderAdminPage(loggedUser) {
             `)
           );
         });
-      $('#content').on('click', '.fas.fa-user-cog', function() {
+      $('#content').on('click', '.fas.fa-user-cog', async function() {
           var userId = $(this).attr('userid'); // Get the userid from the clicked icon
+          $(this).addClass('fa-user-alt');
+          $(this).removeClass('fa-user-cog');
       });
   
-      $('#content').on('click', '.fas.fa-user-alt', function() {
+      $('#content').on('click', '.fas.fa-user-alt', async function() {
         var userId = $(this).attr('userid'); // Get the userid from the clicked icon
-        API.promoteAccount(userId);
+        await API.promoteAccount(userId);
+        $(this).addClass('fa-user-cog');
+        $(this).removeClass('fa-user-alt');
+
       });
   
       $('#content').on('click', '.fa-regular.fa-circle, .fa.fa-ban', function() {
           var userId = $(this).attr('userid'); // Get the userid from the clicked icon
-          console.log('Clicked verification status for user ID:', userId);
-          
-          // Perform specific actions for verification status icon click
       });
   
       $('#content').on('click', '.fas.fa-user-slash', function() {
           var userId = $(this).attr('userid'); // Get the userid from the clicked icon
-          console.log('Clicked user ban icon for user ID:', userId);
-          
-          // Perform specific actions for user ban icon click
       });
       })
       .catch((error) => {
