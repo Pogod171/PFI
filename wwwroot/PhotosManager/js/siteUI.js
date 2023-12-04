@@ -579,7 +579,6 @@ function renderAdminPage() {
 }
 
 function renderRemoveUser(userToRemove){
-  let loggedUser = API.retrieveLoggedUser();
   initTimeout(300, function () {
     API.logout();
     renderLoginForm(
@@ -624,8 +623,7 @@ function renderRemoveUser(userToRemove){
   $("#deleteUserForm").on("submit", async function (event) {
     event.preventDefault();
     await API.unsubscribeAccount(userToRemove.Id);
-    API.logout();
-    renderLoginForm();
+    renderAdminPage();
   });
 }
 
