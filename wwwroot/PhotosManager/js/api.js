@@ -145,6 +145,24 @@ class API {
             });
         });
     }
+
+    static promoteAccount(userId){
+        API.initHttpState();
+        return new Promise(resolve => {
+            $.ajax({
+                url: serverHost + "/Accounts/promote/" + userId,
+                type: 'GET',
+                contentType: 'application/json',
+                headers: API.getBearerAuthorizationToken(),
+                data: {},
+                success: () => {
+                    resolve(true);
+                },
+                error: xhr => { API.setHttpErrorState(xhr); resolve(false); }
+            });
+        });
+    }
+
     static GetAccounts() {
         API.initHttpState();
         return new Promise(resolve => {
