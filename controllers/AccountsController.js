@@ -178,4 +178,9 @@ export default class AccountsController extends Controller {
             this.authorizations = previousAuthorization;
         }
     }
+
+    promote(id){
+        let user = this.repository.findByField("Id", id);
+        console.log(user);
+    }
 }
