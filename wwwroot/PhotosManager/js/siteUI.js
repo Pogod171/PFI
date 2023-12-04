@@ -164,7 +164,8 @@ function renderLoginForm(
   Email = "",
   EmailError = "",
   passwordError = "",
-  expiredSessionMessage = ""
+  expiredSessionMessage = "",
+  newContactMessage = "",
 ) {
   noTimeout();
   saveContentScrollPosition();
@@ -173,6 +174,7 @@ function renderLoginForm(
   $("#content").append(
     $(`<div class="content" style="text-align:center">
         <h3 class="errorContainer">${expiredSessionMessage}</h3>
+        <h3 class="errorContainer">${newContactMessage}</h3>
         <form class="form" id="loginForm">
             <input type='email'
                 name='Email'
@@ -329,24 +331,19 @@ function renderCreateProfil() {
     createProfil(profil); // commander la création au service API
   });
 }
-/*
-function NewProfile(){
-   let profil = {};
-   profil.Id = 0;
-   profil.Courriel = "";
-   profil.Password = "";
-   profil.Nom = "";
-   profil.Avatar = "";
-   return profil;
-}
-*/
-function createProfil(profil){
- // if(profil){
-    api.register(profil);
- // }
- // else{
-   // renderError("Profil pas créer");
-  //}
+
+
+
+function createProfil(profil) {
+  if (profil != null) {
+    API.register(profil);//rajouter une fonction qui amène au menu avec le message de confirmation de cération?
+    renderLoginForm( "", "", "", "", `
+          Votre compte à été créé. Veillez prendre vos courriel¸
+          pour récupérer votre code de vérification qui vous sera demandé lors de votre prochaine conexion`);
+  }
+  else {
+    renderError("Profil pas créer");
+  }
 }
 
 function renderMainPage(user) {
