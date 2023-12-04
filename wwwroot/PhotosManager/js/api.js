@@ -145,12 +145,14 @@ class API {
             });
         });
     }
+    //[GET::/accounts/logout?userId=13d91630-818d-11ee-b89b-c91bf460b1a8]
+    //[GET::/accounts/promote?userId=17988070-7f22-11ee-b433-0bad428eeaac]
 
     static promoteAccount(userId){
         API.initHttpState();
         return new Promise(resolve => {
             $.ajax({
-                url: serverHost + "/Accounts/promote/" + userId,
+                url: serverHost + "/accounts/promote?userId=" + userId,
                 type: 'GET',
                 contentType: 'application/json',
                 headers: API.getBearerAuthorizationToken(),
