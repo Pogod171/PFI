@@ -192,7 +192,7 @@ function renderLoginForm(
                 required
                 RequireMessage = 'Veuillez entrer votre mot de passe'>
             <span style='color:red'>${passwordError}</span>
-            <input type='submit' name='submit' value="Entrer" class="form-control btn-primary">
+            <input type='submit' name='submit' value="Entrer" class="form-control btn-primary" id="loginForm">
         </form>
         <div class="form">
             <hr>
@@ -212,7 +212,11 @@ function renderLoginForm(
     event.preventDefault();
     let profil = getFormData($("#loginForm"));
     // showWaitingGif();
-    await API.login(profil.Email, profil.Password);
+    if(profil.VerifyCode !=="verified"){
+      renderNewContactPage(profil);
+    }else {
+       await API.login(profil.Email, profil.Password);
+    }
     if (API.error) {
       switch (API.currentStatus) {
         case 481:
@@ -240,8 +244,6 @@ function renderCreateProfil() {
   eraseContent(); // effacer le conteneur #content
   updateHeader("Inscription", "createProfil"); // mettre à jour l’entête et menu
   $("#newPhotoCmd").hide(); // camouffler l’icone de commande d’ajout de photo
-  //J'ai rajouter un newProfil
-  //let createProfil = NewProfile();
   $("#content").append(
     `<form class="form" id="createProfilForm"'>
       <fieldset>
@@ -336,7 +338,7 @@ function renderCreateProfil() {
 
 function createProfil(profil) {
   if (profil != null) {
-    API.register(profil);//rajouter une fonction qui amène au menu avec le message de confirmation de cération?
+    API.register(profil);
     renderLoginForm( "", "", "", "", `
           Votre compte à été créé. Veillez prendre vos courriel¸
           pour récupérer votre code de vérification qui vous sera demandé lors de votre prochaine conexion`);
@@ -485,6 +487,44 @@ function renderDeleteProfil(user) {
     API.logout();
     renderLoginForm();
   });
+}
+
+function renderNewContactPage(user){
+  noTimeout();
+  eraseContent();
+  let loggedUser = API.retrieveLoggedUser();
+    updateHeader("Vérification", "", loggedUser);
+    $("#content").append(
+      $(` <form class="form" id="confirmProfilForm"'>
+        <div> 
+            Veuillez entrer le code de vérification que vous avez reçu par courriel!
+        </div>
+        <div>
+        <input type="text"
+        class="form-control Alpha"
+        name="CodeVerification"
+        id="codeVerification"
+        placeholder="Code de vérification de courriel"
+        required
+        RequireMessage = 'Veuillez entrer votre code de vérification'
+        InvalidMessage = 'code invalide'
+         >
+        </div>
+        <input type='submit' name='submit' id='saveUserCmd' value="Enregistrer" class="form-control btn-primary">
+        </form
+      `)
+    );
+    initFormValidation();
+
+    $("#confirmProfilForm").on("submit", function (event) {
+      let code = getFormData($("#confirmProfilForm"));
+      event.preventDefault(); 
+      showWaitingGif(); 
+      API.verifyEmail(user.Id, code.CodeVerification) //mettre un if après pour si code valide?
+      //API.verify()
+      renderMainPage(user);//go à la page de photo
+      
+    });
 }
 
 function renderAdminPage() {
