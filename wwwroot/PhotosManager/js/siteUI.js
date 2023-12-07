@@ -356,7 +356,8 @@ function renderMainPage() {
   let user = API.retrieveLoggedUser();
   console.log(user.VerifyCode);
 
-  if (user.VerifyCode === "unverified") {
+  if (user.VerifyCode !== "verified") {
+    console.log("unverified");
     renderNewContactPage(user);
   } else {
     initTimeout(300, function () {
