@@ -556,7 +556,8 @@ function renderAdminPage() {
     API.GetAccounts()
       .then((result) => {
         result.data.forEach((user) => {
-          console.log(user);
+          if(user.Id != loggedUser.Id){
+            console.log(user);
           let promoIcon = ``;
           let verifiedIcon = ``;
           if (isAdmin(user)) {
@@ -592,6 +593,8 @@ function renderAdminPage() {
               </div>
             `)
           );
+          }
+          
         });
         $("#content").on("click", ".fas.fa-user-cog", async function () {
           var userId = $(this).attr("userid"); // Get the userid from the clicked icon
