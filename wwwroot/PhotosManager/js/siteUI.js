@@ -593,6 +593,7 @@ function renderAdminPage() {
         });
       $('#content').on('click', '.fas.fa-user-cog', async function() {
           var userId = $(this).attr('userid'); // Get the userid from the clicked icon
+          await API.demoteAccount(userId);
           $(this).addClass('fa-user-alt');
           $(this).removeClass('fa-user-cog');
       });
@@ -605,9 +606,16 @@ function renderAdminPage() {
 
       });
   
-      $('#content').on('click', '.fa-regular.fa-circle, .fa.fa-ban', function() {
+      $('#content').on('click', '.fa-regular.fa-circle.greenCmd', function() {
+        $(this).addClass('fa fa-ban redCmd');
+        $(this).removeClass('fa-regular fa-circle greenCmd');
           var userId = $(this).attr('userid'); // Get the userid from the clicked icon
       });
+      $('#content').on('click', '.fa.fa-ban.redCmd', function() {
+        $(this).addClass('fa-regular fa-circle greenCmd');
+        $(this).removeClass('fa fa-ban redCmd');
+        var userId = $(this).attr('userid'); // Get the userid from the clicked icon
+    });
   
       $('#content').on('click', '.fas.fa-user-slash', function() {
           var userId = $(this).attr('userid'); // Get the userid from the clicked icon
