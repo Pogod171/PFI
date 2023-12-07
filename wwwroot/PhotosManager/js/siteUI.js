@@ -514,7 +514,7 @@ function renderNewContactPage(user) {
         </div>
         <div>
         <input type="text"
-        class="form-control Alpha"
+        class="form-control AlphaNum"
         name="CodeVerification"
         id="codeVerification"
         placeholder="Code de vérification de courriel"
