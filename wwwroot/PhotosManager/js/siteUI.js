@@ -211,12 +211,10 @@ function renderLoginForm(
   $("#loginForm").on("submit", async function (event) {
     event.preventDefault();
     let profil = getFormData($("#loginForm"));
+    console.log(profil);
     // showWaitingGif();
-    if(profil.VerifyCode !=="verified"){
-      renderNewContactPage(profil);
-    }else {
-       await API.login(profil.Email, profil.Password);
-    }
+    await API.login(profil.Email, profil.Password);
+    
     if (API.error) {
       switch (API.currentStatus) {
         case 481:
@@ -348,7 +346,12 @@ function createProfil(profil) {
   }
 }
 
-function renderMainPage(user) {
+function renderMainPage(user) {//////////////////////////////////////////////////////////////////////////////////////////////
+  console.log(user.VerifyCode)
+  if(user.VerifyCode ==="unverified"){
+    renderNewContactPage(user);
+  }
+
   initTimeout(300, function () {
     API.logout();
     renderLoginForm(
@@ -364,7 +367,7 @@ function renderMainPage(user) {
   updateHeader("Liste des photos", "mainPage", user); // mettre à jour l’entête et menu
 }
 
-function renderEditProfil(loggedUser) {
+function renderEditProfil(loggedUser) {/////////////////////////////////////////////////////////////////////////////////
   eraseContent(); // effacer le conteneur #content
   updateHeader("Profil", "editProfil", loggedUser); // mettre à jour l’entête et menu
   $("#newPhotoCmd").hide(); // camouffler l’icone de commande d’ajout de photo
@@ -445,6 +448,7 @@ function renderEditProfil(loggedUser) {
     </div>`
   );
   $("#abortCmd").on("click", function () {
+    API.modifyUserProfil(loggedUser);
     renderMainPage(loggedUser);
   });
   $("#deleteCmd").on("click", function () {
@@ -518,9 +522,11 @@ function renderNewContactPage(user){
 
     $("#confirmProfilForm").on("submit", function (event) {
       let code = getFormData($("#confirmProfilForm"));
+      console.log(code.CodeVerification);
       event.preventDefault(); 
       showWaitingGif(); 
       API.verifyEmail(user.Id, code.CodeVerification) //mettre un if après pour si code valide?
+      sendConfirmedEmail(user)
       //API.verify()
       renderMainPage(user);//go à la page de photo
       
