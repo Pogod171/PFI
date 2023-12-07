@@ -602,12 +602,10 @@ function renderAdminPage() {
                     style="background-image:url('${user.Avatar}')"
                     title="${user.Name}"></div>
                 <span class="UserInfo">
-                  
                   <span class="UserName">${user.Name}</span>
                   <span class="UserEmail">${user.Email}</span>
                 </span>
                 </div>
-                
               </div>
               <span class="UserCommandPanel">
                   ${promoIcon}
