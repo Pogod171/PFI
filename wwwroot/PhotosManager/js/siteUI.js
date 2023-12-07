@@ -461,12 +461,21 @@ function renderEditProfil(loggedUser) {
          class="form-control btn-primary">
     </form>
     <div class="cancel">
-      <button class="form-control btn-secondary" id="abortCmd">Annuler</button>
+      <button class="form-control btn-secondary" id="editProfilForm">Annuler</button>
     </div>
     <div class="cancel"> <hr>
       <button class="form-control btn-warning" id="deleteCmd">Effacer le compte</button>
     </div>`
   );
+  $("#editProfilForm").on("submit", function (event) {
+    let profil = getFormData($("#editProfilForm"));
+    console.log(profil);
+    event.preventDefault();
+    delete profil.matchedPassword;
+    delete profil.matchedEmail;
+    API.modifyUserProfil(profil);
+    renderMainPage(profil);
+  });
   $("#abortCmd").on("click", function () {
     API.modifyUserProfil(loggedUser);
     renderMainPage(loggedUser);
