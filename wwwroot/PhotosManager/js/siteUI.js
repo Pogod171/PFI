@@ -535,7 +535,7 @@ function renderNewContactPage(user) {
     event.preventDefault();
     showWaitingGif();
     API.verifyEmail(user.Id, code.CodeVerification); //mettre un if après pour si code valide?
-    renderMainPage(user); //go à la page de photo
+    renderMainPage(); //go à la page de photo
   });
 }
 
