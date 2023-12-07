@@ -367,22 +367,14 @@ function renderMainPage() {
   let user = API.retrieveLoggedUser();
   console.log(user.VerifyCode);
 
-  if (user.VerifyCode !== "verified") {
-    console.log("unverified");
-    renderNewContactPage(user);
-  } else {
-    initTimeout(300, function () {
-      API.logout();
-      renderLoginForm(
-        "",
-        "",
-        "",
-        "Votre session est expirée. Veuillez vous reconnecter."
-      );
-    });
+  if (user.VerifyCode == "verified" || user.VerifyCode == "blocked"){
+    console.log(user.VerifyCode);
     timeout();
     eraseContent();
     updateHeader("Liste des photos", "mainPage", user); // mettre à jour l’entête et menu
+    setLoginTimer();
+  }else{
+    renderNewContactPage(user);
   }
 }
 
@@ -485,18 +477,10 @@ function renderEditProfil(loggedUser) {
   $("#deleteCmd").on("click", function () {
     renderDeleteProfil(loggedUser);
   });
+  setLoginTimer();
 }
 
 function renderDeleteProfil(user) {
-  initTimeout(300, function () {
-    API.logout();
-    renderLoginForm(
-      "",
-      "",
-      "",
-      "Votre session est expirée. Veuillez vous reconnecter."
-    );
-  });
   updateHeader("Retrait de compte", "deleteProfil", user); // mettre à jour l’entête et menu
   eraseContent();
   $("#content").append(
@@ -522,6 +506,7 @@ function renderDeleteProfil(user) {
     API.logout();
     renderLoginForm();
   });
+  setLoginTimer();
 }
 
 function renderNewContactPage(user) {
@@ -566,15 +551,6 @@ function renderAdminPage() {
   if (!isAdmin(loggedUser)) {
     renderMainPage(loggedUser);
   } else {
-    initTimeout(300, function () {
-      API.logout();
-      renderLoginForm(
-        "",
-        "",
-        "",
-        "Votre session est expirée. Veuillez vous reconnecter."
-      );
-    });
     updateHeader("Gestion des usagers", "admin", loggedUser); // mettre à jour l’entête et menu
     eraseContent();
     API.GetAccounts()
@@ -657,19 +633,11 @@ function renderAdminPage() {
         console.error("Error:", error);
       });
     $("#content").append(`</div>`);
+    setLoginTimer();
   }
 }
 
 function renderRemoveUser(userToRemove) {
-  initTimeout(300, function () {
-    API.logout();
-    renderLoginForm(
-      "",
-      "",
-      "",
-      "Votre session est expirée. Veuillez vous reconnecter."
-    );
-  });
   updateHeader("Retrait de compte", "deleteProfil", userToRemove); // mettre à jour l’entête et menu
   eraseContent();
   $("#content").append(
@@ -707,6 +675,7 @@ function renderRemoveUser(userToRemove) {
     await API.unsubscribeAccount(userToRemove.Id);
     renderAdminPage();
   });
+  setLoginTimer();
 }
 
 function renderAbout() {
@@ -714,17 +683,8 @@ function renderAbout() {
   saveContentScrollPosition();
   eraseContent();
   if(API.retrieveLoggedUser() != null){
-    initTimeout(300, function () {
-      API.logout();
-      renderLoginForm(
-        "",
-        "",
-        "",
-        "Votre session est expirée. Veuillez vous reconnecter."
-      );
-    });
-    console.log(API.retrieveLoggedUser());
     updateHeader("À propos...", "about", API.retrieveLoggedUser());
+    setLoginTimer();
   }
   else{
     updateHeader("À propos...", "about");
@@ -757,4 +717,29 @@ function Init_UI() {
   } else {
     renderMainPage(user);
   }
+}
+
+function setLoginTimer(){
+  initTimeout(300, function () {
+    API.logout();
+    renderLoginForm(
+      "",
+      "",
+      "",
+      "Votre session est expirée. Veuillez vous reconnecter."
+    );
+  });
+  verifyBlockedUser();
+}
+
+function verifyBlockedUser(){
+ if(API.retrieveLoggedUser.VerifyCode == "blocked"){
+  API.logout();
+    renderLoginForm(
+      "",
+      "",
+      "",
+      "Vous êtes bloqué!"
+    );
+ }
 }
