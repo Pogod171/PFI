@@ -65,11 +65,16 @@ function updateHeader(titre = "", header = "", loggedUser = null) {
                       <i class="cmdIcon fa fa-ellipsis-vertical"></i>
                   </div>
                   <div class="dropdown-menu noselect" id="DDMenu">
+                  <div class="dropdown-item menuItemLayout" id="loginCmd">
+                  <i class="menuIcon fa fa-sign-in mx-2"></i> Connexion
+                  </div>
+                  <div class="dropdown-divider"></div>
                   <div class="dropdown-item menuItemLayout" id="aboutCmd">
                       <i class="menuIcon fa fa-info-circle mx-2"></i> À propos...
                   </div>
               </div>
-          </div>`)
+          </div>
+          `)
     );
   } else {
     let menuAdmin = isAdmin(loggedUser)
@@ -154,11 +159,19 @@ function updateHeader(titre = "", header = "", loggedUser = null) {
     $("#editProfilMenuCmd").on("click", function () {
       renderEditProfil(loggedUser);
     });
+    
     $("#logoutCmd").on("click", function () {
       API.logout();
       renderLoginForm();
     });
   }
+  $("#loginCmd").on("click", function () {
+    console.log("Alo");
+    renderLoginForm();
+  });
+  $("#aboutCmd").on("click", function () {
+    renderAbout();
+  });
 }
 function renderLoginForm(
   Email = "",
@@ -202,9 +215,7 @@ function renderLoginForm(
   );
   initFormValidation();
 
-  $("#aboutCmd").on("click", function () {
-    renderAbout();
-  });
+  
   $("#createProfilCmd").on("click", function () {
     renderCreateProfil();
   });
@@ -692,7 +703,22 @@ function renderAbout() {
   timeout();
   saveContentScrollPosition();
   eraseContent();
-  updateHeader("À propos...", "about");
+  if(API.retrieveLoggedUser() != null){
+    initTimeout(300, function () {
+      API.logout();
+      renderLoginForm(
+        "",
+        "",
+        "",
+        "Votre session est expirée. Veuillez vous reconnecter."
+      );
+    });
+    console.log(API.retrieveLoggedUser());
+    updateHeader("À propos...", "about", API.retrieveLoggedUser());
+  }
+  else{
+    updateHeader("À propos...", "about");
+  }
 
   $("#content").append(
     $(`
