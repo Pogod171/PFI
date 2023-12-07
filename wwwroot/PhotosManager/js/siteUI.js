@@ -467,6 +467,8 @@ function renderEditProfil(loggedUser) {
       <button class="form-control btn-warning" id="deleteCmd">Effacer le compte</button>
     </div>`
   );
+  initFormValidation();
+  initImageUploaders();
   $("#editProfilForm").on("submit", function (event) {
     let profil = getFormData($("#editProfilForm"));
     console.log(profil);
