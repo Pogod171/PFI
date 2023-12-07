@@ -154,7 +154,7 @@ class API {
             $.ajax({
                 url: serverHost + "/accounts/promote?userId=" + userId,
                 type: 'GET',
-                contentType: 'text/plain',
+                contentType: 'application/json',
                 headers: API.getBearerAuthorizationToken(),
                 data: {},
                 success: () => {
