@@ -367,8 +367,8 @@ function renderMainPage() {
   let user = API.retrieveLoggedUser();
   console.log(user.VerifyCode);
 
-  if (user.VerifyCode == "verified" || user.VerifyCode == "blocked"){
-    console.log(user.VerifyCode);
+  if (user.VerifyCode == "verified" || user.VerifyCode == "unverified"){
+    console.log(user);
     timeout();
     eraseContent();
     updateHeader("Liste des photos", "mainPage", user); // mettre à jour l’entête et menu
@@ -566,7 +566,7 @@ function renderAdminPage() {
           }
           if (user.VerifyCode == "verified") {
             verifiedIcon = `<i class="fa-regular fa-circle greenCmd" userid="${user.Id}"></i>`;
-          } else if (user.VerifyCode == "blocked") {
+          } else if (user.VerifyCode == "unverified") {
             verifiedIcon = `<i class="fa fa-ban redCmd" userid="${user.Id}"></i>`;
           }
           $("#content").append(
@@ -720,6 +720,7 @@ function Init_UI() {
 }
 
 function setLoginTimer(){
+  verifyBlockedUser();
   initTimeout(300, function () {
     API.logout();
     renderLoginForm(
@@ -729,11 +730,11 @@ function setLoginTimer(){
       "Votre session est expirée. Veuillez vous reconnecter."
     );
   });
-  verifyBlockedUser();
 }
 
 function verifyBlockedUser(){
- if(API.retrieveLoggedUser.VerifyCode == "blocked"){
+ if(API.retrieveLoggedUser().VerifyCode == "unverified"){
+  console.log("blocked!");
   API.logout();
     renderLoginForm(
       "",
