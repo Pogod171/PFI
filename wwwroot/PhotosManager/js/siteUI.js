@@ -577,7 +577,6 @@ function renderAdminPage() {
     });
     updateHeader("Gestion des usagers", "admin", loggedUser); // mettre à jour l’entête et menu
     eraseContent();
-    $("#content").append(`<div class="UserContainer">`);
     API.GetAccounts()
       .then((result) => {
         result.data.forEach((user) => {
@@ -596,19 +595,21 @@ function renderAdminPage() {
           }
           $("#content").append(
             $(`
+              <div class="UserContainer">
               <div class="UserRow">
                 <div class="UserLayout">
-                <span class="UserInfo">
-                  <i>
                     <div class="UserAvatar" userid="${user.Id}"
                     style="background-image:url('${user.Avatar}')"
                     title="${user.Name}"></div>
-                  </i>
+                <span class="UserInfo">
+                  
                   <span class="UserName">${user.Name}</span>
                   <span class="UserEmail">${user.Email}</span>
                 </span>
                 </div>
-                <span class="UserCommandPanel">
+                
+              </div>
+              <span class="UserCommandPanel">
                   ${promoIcon}
                   ${verifiedIcon}
                   <i class="fas fa-user-slash goldenrodCmd" userid="${user.Id}"></i>
