@@ -367,7 +367,7 @@ function renderMainPage() {
   let user = API.retrieveLoggedUser();
   console.log(user.VerifyCode);
 
-  if (user.VerifyCode == "verified" || user.VerifyCode == "unverified"){
+  if (user.VerifyCode == "verified"){//|| user.VerifyCode == "unverified"
     console.log(user);
     timeout();
     eraseContent();
