@@ -24,7 +24,7 @@ function isAdmin(loggedUser) {
   );
 }
 function getUserById(usersArray, userId) {
-  return usersArray.find(user => user.Id === userId);
+  return usersArray.find((user) => user.Id === userId);
 }
 
 function eraseContent() {
@@ -165,7 +165,7 @@ function renderLoginForm(
   EmailError = "",
   passwordError = "",
   expiredSessionMessage = "",
-  newContactMessage = "",
+  newContactMessage = ""
 ) {
   noTimeout();
   saveContentScrollPosition();
@@ -214,7 +214,7 @@ function renderLoginForm(
     console.log(profil);
     // showWaitingGif();
     await API.login(profil.Email, profil.Password);
-    
+
     if (API.error) {
       switch (API.currentStatus) {
         case 481:
@@ -226,8 +226,7 @@ function renderLoginForm(
         default:
           renderError("Le serveur ne répond pas");
       }
-    }
-    else{
+    } else {
       renderMainPage();
     }
   });
@@ -322,7 +321,7 @@ function renderCreateProfil() {
   $("#abortCmd").on("click", function () {
     renderLoginForm();
   }); // ajouter le mécanisme de vérification de doublon de courriel
-  addConflictValidation(API.checkConflictURL(), "Email", "saveUserCmd");// il vérifie si c'est un type courriel
+  addConflictValidation(API.checkConflictURL(), "Email", "saveUserCmd"); // il vérifie si c'est un type courriel
   //Vérifie si le courriel existe déjà dans la base de donnée
   // call back la soumission du formulaire
   $("#createProfilForm").on("submit", function (event) {
@@ -335,44 +334,48 @@ function renderCreateProfil() {
   });
 }
 
-
-
 function createProfil(profil) {
   if (profil != null) {
     API.register(profil);
-    renderLoginForm( "", "", "", "", `
-          Votre compte à été créé. Veillez prendre vos courriel¸
-          pour récupérer votre code de vérification qui vous sera demandé lors de votre prochaine conexion`);
-  }
-  else {
-    renderError("Profil pas créer");
-  }
-}
-
-function renderMainPage() {//////////////////////////////////////////////////////////////////////////////////////////////
-  let user = API.retrieveLoggedUser();
-  console.log(user.VerifyCode)
-
-  if(user.VerifyCode ==="unverified"){
-    renderNewContactPage(user);
-  }
-
-  initTimeout(300, function () {
-    API.logout();
     renderLoginForm(
       "",
       "",
       "",
-      "Votre session est expirée. Veuillez vous reconnecter."
+      "",
+      `
+          Votre compte à été créé. Veillez prendre vos courriel¸
+          pour récupérer votre code de vérification qui vous sera demandé lors de votre prochaine conexion`
     );
-  });
-
-  timeout();
-  eraseContent();
-  updateHeader("Liste des photos", "mainPage", user); // mettre à jour l’entête et menu
+  } else {
+    renderError("Profil pas créer");
+  }
 }
 
-function renderEditProfil(loggedUser) {/////////////////////////////////////////////////////////////////////////////////
+function renderMainPage() {
+  //////////////////////////////////////////////////////////////////////////////////////////////
+  let user = API.retrieveLoggedUser();
+  console.log(user.VerifyCode);
+
+  if (user.VerifyCode === "unverified") {
+    renderNewContactPage(user);
+  } else {
+    initTimeout(300, function () {
+      API.logout();
+      renderLoginForm(
+        "",
+        "",
+        "",
+        "Votre session est expirée. Veuillez vous reconnecter."
+      );
+    });
+    timeout();
+    eraseContent();
+    updateHeader("Liste des photos", "mainPage", user); // mettre à jour l’entête et menu
+  }
+}
+
+function renderEditProfil(loggedUser) {
+  /////////////////////////////////////////////////////////////////////////////////
   eraseContent(); // effacer le conteneur #content
   updateHeader("Profil", "editProfil", loggedUser); // mettre à jour l’entête et menu
   $("#newPhotoCmd").hide(); // camouffler l’icone de commande d’ajout de photo
@@ -498,13 +501,13 @@ function renderDeleteProfil(user) {
   });
 }
 
-function renderNewContactPage(user){
+function renderNewContactPage(user) {
   noTimeout();
   eraseContent();
   let loggedUser = API.retrieveLoggedUser();
-    updateHeader("Vérification", "", loggedUser);
-    $("#content").append(
-      $(` <form class="form" id="confirmProfilForm"'>
+  updateHeader("Vérification", "", loggedUser);
+  $("#content").append(
+    $(` <form class="form" id="confirmProfilForm"'>
         <div> 
             Veuillez entrer le code de vérification que vous avez reçu par courriel!
         </div>
@@ -522,20 +525,19 @@ function renderNewContactPage(user){
         <input type='submit' name='submit' id='saveUserCmd' value="Enregistrer" class="form-control btn-primary">
         </form
       `)
-    );
-    initFormValidation();
+  );
+  initFormValidation();
 
-    $("#confirmProfilForm").on("submit", function (event) {
-      let code = getFormData($("#confirmProfilForm"));
-      console.log(code.CodeVerification);
-      event.preventDefault(); 
-      showWaitingGif(); 
-      API.verifyEmail(user.Id, code.CodeVerification) //mettre un if après pour si code valide?
-      sendConfirmedEmail(user)
-      //API.verify()
-      renderMainPage(user);//go à la page de photo
-      
-    });
+  $("#confirmProfilForm").on("submit", function (event) {
+    let code = getFormData($("#confirmProfilForm"));
+    console.log(code.CodeVerification);
+    event.preventDefault();
+    showWaitingGif();
+    API.verifyEmail(user.Id, code.CodeVerification); //mettre un if après pour si code valide?
+    sendConfirmedEmail(user);
+    //API.verify()
+    renderMainPage(user); //go à la page de photo
+  });
 }
 
 function renderAdminPage() {
@@ -566,10 +568,9 @@ function renderAdminPage() {
           } else if (isUser(user)) {
             promoIcon = `<i class="fas fa-user-alt dodgerblueCmd" userid="${user.Id}"></i>`;
           }
-          if(user.VerifyCode == "verified"){
+          if (user.VerifyCode == "verified") {
             verifiedIcon = `<i class="fa-regular fa-circle greenCmd" userid="${user.Id}"></i>`;
-          }
-          else if (user.VerifyCode == "blocked"){
+          } else if (user.VerifyCode == "blocked") {
             verifiedIcon = `<i class="fa fa-ban redCmd" userid="${user.Id}"></i>`;
           }
           $("#content").append(
@@ -596,48 +597,50 @@ function renderAdminPage() {
             `)
           );
         });
-      $('#content').on('click', '.fas.fa-user-cog', async function() {
-          var userId = $(this).attr('userid'); // Get the userid from the clicked icon
+        $("#content").on("click", ".fas.fa-user-cog", async function () {
+          var userId = $(this).attr("userid"); // Get the userid from the clicked icon
           await API.demoteAccount(userId);
-          $(this).addClass('fa-user-alt');
-          $(this).removeClass('fa-user-cog');
-      });
-  
-      $('#content').on('click', '.fas.fa-user-alt', async function() {
-        var userId = $(this).attr('userid'); // Get the userid from the clicked icon
-        await API.promoteAccount(userId);
-        $(this).addClass('fa-user-cog');
-        $(this).removeClass('fa-user-alt');
+          $(this).addClass("fa-user-alt");
+          $(this).removeClass("fa-user-cog");
+        });
 
-      });
-  
-      $('#content').on('click', '.fa-regular.fa-circle.greenCmd', function() {
-        $(this).addClass('fa fa-ban redCmd');
-        $(this).removeClass('fa-regular fa-circle greenCmd');
-          var userId = $(this).attr('userid'); // Get the userid from the clicked icon
-      });
-      $('#content').on('click', '.fa.fa-ban.redCmd', function() {
-        $(this).addClass('fa-regular fa-circle greenCmd');
-        $(this).removeClass('fa fa-ban redCmd');
-        var userId = $(this).attr('userid'); // Get the userid from the clicked icon
-    });
-  
-      $('#content').on('click', '.fas.fa-user-slash', function() {
-          var userId = $(this).attr('userid'); // Get the userid from the clicked icon
+        $("#content").on("click", ".fas.fa-user-alt", async function () {
+          var userId = $(this).attr("userid"); // Get the userid from the clicked icon
+          await API.promoteAccount(userId);
+          $(this).addClass("fa-user-cog");
+          $(this).removeClass("fa-user-alt");
+        });
+
+        $("#content").on(
+          "click",
+          ".fa-regular.fa-circle.greenCmd",
+          function () {
+            $(this).addClass("fa fa-ban redCmd");
+            $(this).removeClass("fa-regular fa-circle greenCmd");
+            var userId = $(this).attr("userid"); // Get the userid from the clicked icon
+          }
+        );
+        $("#content").on("click", ".fa.fa-ban.redCmd", function () {
+          $(this).addClass("fa-regular fa-circle greenCmd");
+          $(this).removeClass("fa fa-ban redCmd");
+          var userId = $(this).attr("userid"); // Get the userid from the clicked icon
+        });
+
+        $("#content").on("click", ".fas.fa-user-slash", function () {
+          var userId = $(this).attr("userid"); // Get the userid from the clicked icon
           let user = getUserById(result.data, userId);
           renderRemoveUser(user);
-      });
+        });
       })
       .catch((error) => {
         // Handle any errors that might occur during the Promise execution
         console.error("Error:", error);
       });
-      $("#content").append(`</div>`);
-    
+    $("#content").append(`</div>`);
   }
 }
 
-function renderRemoveUser(userToRemove){
+function renderRemoveUser(userToRemove) {
   initTimeout(300, function () {
     API.logout();
     renderLoginForm(
