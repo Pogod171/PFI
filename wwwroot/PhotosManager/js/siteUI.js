@@ -618,16 +618,16 @@ function renderAdminPage() {
         });
         $("#content").on("click", ".fas.fa-user-cog", async function () {
           var userId = $(this).attr("userid"); // Get the userid from the clicked icon
-          await API.demoteAccount(userId);
           $(this).addClass("fa-user-alt");
           $(this).removeClass("fa-user-cog");
+          await API.demoteAccount(userId);
         });
 
         $("#content").on("click", ".fas.fa-user-alt", async function () {
           var userId = $(this).attr("userid"); // Get the userid from the clicked icon
-          await API.promoteAccount(userId);
           $(this).addClass("fa-user-cog");
           $(this).removeClass("fa-user-alt");
+          await API.promoteAccount(userId);
         });
 
         $("#content").on(
