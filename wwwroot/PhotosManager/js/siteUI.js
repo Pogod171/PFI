@@ -227,6 +227,9 @@ function renderLoginForm(
           renderError("Le serveur ne répond pas");
       }
     }
+    else{
+      renderMainPage();
+    }
   });
 }
 function getFormData($form) {
@@ -346,8 +349,10 @@ function createProfil(profil) {
   }
 }
 
-function renderMainPage(user) {//////////////////////////////////////////////////////////////////////////////////////////////
+function renderMainPage() {//////////////////////////////////////////////////////////////////////////////////////////////
+  let user = API.retrieveLoggedUser();
   console.log(user.VerifyCode)
+
   if(user.VerifyCode ==="unverified"){
     renderNewContactPage(user);
   }
