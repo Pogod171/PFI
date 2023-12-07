@@ -154,7 +154,23 @@ class API {
             $.ajax({
                 url: serverHost + "/accounts/promote?userId=" + userId,
                 type: 'GET',
-                contentType: 'application/json',
+                contentType: 'text/plain',
+                headers: API.getBearerAuthorizationToken(),
+                data: {},
+                success: () => {
+                    resolve(true);
+                },
+                error: xhr => { API.setHttpErrorState(xhr); resolve(false); }
+            });
+        });
+    }
+    static demoteAccount(userId){
+        API.initHttpState();
+        return new Promise(resolve => {
+            $.ajax({
+                url: serverHost + "/accounts/demote?userId=" + userId,
+                type: 'GET',
+                contentType: 'text/plain',
                 headers: API.getBearerAuthorizationToken(),
                 data: {},
                 success: () => {
