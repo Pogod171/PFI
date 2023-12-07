@@ -374,7 +374,7 @@ function renderMainPage() {
     updateHeader("Liste des photos", "mainPage", user); // mettre à jour l’entête et menu
     setLoginTimer();
   }else{
-    renderNewContactPage(user);
+    renderValidationPage(user);
   }
 }
 
@@ -509,7 +509,7 @@ function renderDeleteProfil(user) {
   setLoginTimer();
 }
 
-function renderNewContactPage(user) {
+function renderValidationPage(user) {
   noTimeout();
   eraseContent();
   let loggedUser = API.retrieveLoggedUser();
@@ -541,8 +541,8 @@ function renderNewContactPage(user) {
     console.log(code.CodeVerification);
     event.preventDefault();
     showWaitingGif();
-    API.verifyEmail(user.Id, code.CodeVerification); //mettre un if après pour si code valide?
-    renderMainPage(); //go à la page de photo
+    API.verifyEmail(user.Id, code.CodeVerification);
+    renderLoginForm(); 
   });
 }
 
