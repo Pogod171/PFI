@@ -56,9 +56,12 @@ export default class AccountsController extends Controller {
 
     // GET:account/promote?userId=...
     promote(){
+        console.log("kioki");
         if (this.repository != null) {
             let id = this.HttpContext.path.params.userId;
             let user = this.repository.findByField("Id", id);
+            user.Authorizations.readGranted = 2;
+            user.Authorizations.writeGranted = 2;
             console.log(user);
         }
         else{
@@ -67,9 +70,12 @@ export default class AccountsController extends Controller {
     }
 
     demote(){
+        console.log("kioki");
         if (this.repository != null) {
             let id = this.HttpContext.path.params.userId;
             let user = this.repository.findByField("Id", id);
+            user.Authorizations.readGranted = 1;
+            user.Authorizations.writeGranted = 1;
             console.log(user);
         }
         else{
