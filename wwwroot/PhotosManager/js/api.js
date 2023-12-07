@@ -154,7 +154,7 @@ class API {
             $.ajax({
                 url: serverHost + "/accounts/promote?userId=" + userId,
                 type: 'GET',
-                contentType: 'application/json',
+                contentType: 'text/plain',
                 headers: API.getBearerAuthorizationToken(),
                 data: {},
                 success: () => {
@@ -170,7 +170,7 @@ class API {
             $.ajax({
                 url: serverHost + "/accounts/demote?userId=" + userId,
                 type: 'GET',
-                contentType: 'application/json',
+                contentType: 'text/plain',
                 headers: API.getBearerAuthorizationToken(),
                 data: {},
                 success: () => {
