@@ -66,6 +66,17 @@ export default class AccountsController extends Controller {
         }
     }
 
+    demote(){
+        if (this.repository != null) {
+            let id = this.HttpContext.path.params.userId;
+            let user = this.repository.findByField("Id", id);
+            console.log(user);
+        }
+        else{
+            console.log("Non");
+        }
+    }
+
     sendVerificationEmail(user) {
         // bypass model bindeExtraData wich hide the user verifyCode
         user = this.repository.findByField("Id", user.Id);
